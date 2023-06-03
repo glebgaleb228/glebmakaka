@@ -9,13 +9,15 @@ class Block:
         self.y = y
         self.color = color
         self.rect = pygame.Rect(x, y, 50, 50)
+        self.text = ''
 
     def setText(self, text=''):
-        font = pygame.font.SysFont('verdana', 25).render(text, True, 'white')  # создём шрифт для текста
-        scr.blit(font, (self.rect.x, self.rect.y))  # отображаем наш текст
+        self.text = text
 
     def draw(self):
         pygame.draw.rect(scr, self.color, self.rect, 1, 0)  # рисуем квадрат
+        font = pygame.font.SysFont('verdana', 25).render(self.text, True, 'white')  # создём шрифт для текста
+        scr.blit(font, (self.rect.x + 15, self.rect.y + 5))
 
 
 
@@ -26,22 +28,46 @@ scr = pygame.display.set_mode((width, height))
 words = ["чайка", "дом", "дверь"]
 word = choice(words)
 spisok = []
+
 x = 50
 for i in range(len(word)):
     spisok.append(Block(x, 50, "white"))
-    spisok[i].draw()
-    spisok[i].setText(word[i])
+    spisok[i].setText('')
     x += 50
+
+keys = ["А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я"]
+keyboard = []
+x = 50
+y = 400
+for i in range(len(keys)):
+    keyboard.append(Block(x, y, 'blue'))
+    keyboard[i].setText(keys[i])
+    x += 50
+    if i > 0 and i % 10 == 0:
+        x = 50
+        y += 50
 
 GameOver = False
 while not GameOver:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             GameOver = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            for key in keyboard:
+                if key.rect.collidepoint(event.pos):
+                    keyboard.remove(key)
+                    for i in range(len(word)):
+                        if word[i].lower() == key.text.lower():
+                            spisok[i].setText(key.text)
+
 
     scr.fill('black')
 
     for el in spisok:
         el.draw()
+
+    for i in range(len(keyboard)):
+        keyboard[i].draw()
+
 
     pygame.display.update()
